@@ -48,7 +48,7 @@ public class HttpServletInputMessage implements HttpRequest
    protected String httpMethod;
    protected MultivaluedMap<String, String> formParameters;
    protected MultivaluedMap<String, String> decodedFormParameters;
-   protected InputStream overridenStream;
+   protected InputStream overriddenStream;
    protected SynchronousExecutionContext executionContext;
    protected boolean wasForwarded;
 
@@ -143,7 +143,8 @@ public class HttpServletInputMessage implements HttpRequest
       if (formParameters != null) return formParameters;
       // Tomcat does not set getParameters() if it is a PUT request
       // so pull it out manually
-      if (request.getMethod().equals("PUT") && (request.getParameterMap() == null || request.getParameterMap().isEmpty()))
+      final boolean putOrDelete = request.getMethod().equals("PUT") || request.getMethod().equals("DELETE");
+      if (putOrDelete && (request.getParameterMap() == null || request.getParameterMap().isEmpty()))
       {
          return getPutFormParameters();
       }
@@ -157,7 +158,8 @@ public class HttpServletInputMessage implements HttpRequest
       if (decodedFormParameters != null) return decodedFormParameters;
       // Tomcat does not set getParameters() if it is a PUT request
       // so pull it out manually
-      if (request.getMethod().equals("PUT") && (request.getParameterMap() == null || request.getParameterMap().isEmpty()))
+      final boolean putOrDelete = request.getMethod().equals("PUT") || request.getMethod().equals("DELETE");
+      if (putOrDelete && (request.getParameterMap() == null || request.getParameterMap().isEmpty()))
       {
          return getPutDecodedFormParameters();
       }
@@ -197,7 +199,7 @@ public class HttpServletInputMessage implements HttpRequest
    @Override
    public InputStream getInputStream()
    {
-      if (overridenStream != null) return overridenStream;
+      if (overriddenStream != null) return overriddenStream;
       try
       {
          return request.getInputStream();
@@ -211,7 +213,7 @@ public class HttpServletInputMessage implements HttpRequest
    @Override
    public void setInputStream(InputStream stream)
    {
-      this.overridenStream = stream;
+      this.overriddenStream = stream;
    }
 
    @Override
